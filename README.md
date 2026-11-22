@@ -49,7 +49,7 @@ From this, the working theory is that the controller's firmware picks its mode d
 
 **What this tool does:** it only imitates that early activity. While you plug the controller in, it polls the four XInput slots and repeatedly enumerates raw HID devices, then watches for a device with the ID `057E:2009` to appear. Seeing that ID is a good sign, not proof, so always [check it yourself](#checking-that-it-worked). It sends **no commands, no firmware writes, and no Pro Controller handshake** to the controller. It needs no drivers, no admin rights, and installs nothing.
 
-Everything after the mode switch (button mapping, gyro, rumble) is handled by your emulator or app, as it would be for a real Pro Controller.
+Only to initialize the controller in the Pro Controller mode and you close it after that. Everything else (button mapping, gyro, rumble) is handled by your emulator or app, as it would be for a real Pro Controller.
 
 ---
 
@@ -139,7 +139,7 @@ Same logic as Method 1, without the executable.
 
 ## Method 3: HTML page (fallback)
 
-`switch_mode.html` is the original discovery. It does nothing except continuously call the browser's Gamepad API, which is what ends up triggering the mode switch.
+`switch_mode.html` is the original discovery. It does nothing except continuously call the browser's Gamepad API, which is what ends up making the controller stay in the Switch Pro Controller mode.
 
 **Steps**
 
