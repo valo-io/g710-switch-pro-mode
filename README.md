@@ -43,6 +43,8 @@ What was observed, and what we conclude from it:
 - Having **Device Manager** open while plugging the controller in had the same effect.
 - Having the Windows **Game Controllers** window (`joy.cpl`) open *prevented* it.
 
+The mode change is not always stable. When watching the Game Controllers window while plugging in, a controller can appear, disappear immediately, and appear again, with the second one staying. The first is presumably the Pro Controller and the second the normal PS3 (DInput) mode. So the tool only counts the Switch Pro ID once it has stayed visible for a couple of seconds, instead of reacting to a brief flicker.
+
 From this, the working theory is that the controller's firmware picks its mode depending on how the host computer behaves in the first moments after it is plugged in. Browsers and Device Manager enumerate and poll gamepad and HID devices as soon as they appear; the Game Controllers window grabs the device through the older DirectInput API, which keeps it in its default mode. This is a theory based on observation. It is not confirmed by the manufacturer.
 
 **What this tool does:** it only imitates that early activity. While you plug the controller in, it polls the four XInput slots and repeatedly enumerates raw HID devices, then watches for a device with the ID `057E:2009` to appear. Seeing that ID is a good sign, not proof, so always [check it yourself](#checking-that-it-worked). It sends **no commands, no firmware writes, and no Pro Controller handshake** to the controller. It needs no drivers, no admin rights, and installs nothing.
@@ -83,7 +85,7 @@ A single `switch_mode.exe`. No installation, no Python, no dependencies.
 4. **Unplug the controller.**
 5. Double-click `switch_mode.exe`. A console window opens and says it's probing.
 6. **Now plug the controller in.**
-7. Wait a few seconds. If Windows lists a device with the Switch Pro ID, the window prints `ATTEMPT FINISHED` and asks you to verify.
+7. Wait a few seconds. Check the log to see what happened. If Windows lists the Switch Pro ID and it **stays** for a couple of seconds, the log tells you the attempt finished and asks you to verify. If the ID only flickers and the controller settles in DInput (PS3) mode, the log tells you what to do next (see [Troubleshooting](#troubleshooting)).
 8. Press Enter to close the window, then **check whether it really became a Pro Controller** in your emulator ([how to verify](#checking-that-it-worked)).
 
 **Do**
@@ -100,7 +102,7 @@ A single `switch_mode.exe`. No installation, no Python, no dependencies.
 
 **Windows warnings:** the file is unsigned, so SmartScreen may show "Windows protected your PC" (click **More info**, then **Run anyway**), and some antivirus programs flag any unsigned PyInstaller-built program. If you're unsure, read the ~150-line source in `switch_mode.py` or [build the exe yourself](#building-the-executable-yourself).
 
-**Options** (from a terminal): `--timeout N`, `--hold`, `--pnp`, `--verbose`, `--help`.
+**Options** (from a terminal): `--timeout N`, `--settle N` (seconds the ID must stay visible, default 2), `--hold`, `--pnp`, `--no-color`, `--verbose`, `--help`.
 
 ---
 
@@ -119,7 +121,7 @@ Same logic as Method 1, without the executable.
    python switch_mode.py
    ```
 6. When it says it's probing, **plug the controller in**.
-7. Wait for `ATTEMPT FINISHED`, then **check in your emulator** whether it really became a Pro Controller ([how to verify](#checking-that-it-worked)).
+7. Wait for the log to say the attempt finished, then **check in your emulator** whether it really became a Pro Controller ([how to verify](#checking-that-it-worked)).
 
 **Do**
 
@@ -219,6 +221,11 @@ Based on our testing, unplugging the controller and plugging it in again **witho
 
 ## Troubleshooting
 
+- **The controller ends up in DInput (PS3) mode, or the tool says the ID only flickered:**
+  1. Hold the **Home** button until the controller switches to **XInput** mode.
+  2. **Unplug** the controller.
+  3. **Close** the program and open it again.
+  4. **Plug** the controller back in.
 - **Times out or stays in normal mode:** unplug, make sure `joy.cpl`, Steam and other gamepad tools are closed, start the method, then plug in again. I also recommend connecting the controller normally, press the home button to put in in XInput mode, then unpluging it. then run the run the script/program/html then plug in the controller again. it should work this way. try at least 3 more times before attempting a different method. also  Try `--pnp` in case that works for you.
 - **The page or program reports something, but it isn't acting as a Pro Controller:** those messages only show an attempt was made and a device ID was seen. Verify with the [hardware ID](#checking-that-it-worked).
 - **Mode drops after closing the tool:** use `--hold` and keep it running while you play.
