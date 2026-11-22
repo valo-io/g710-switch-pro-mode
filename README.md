@@ -1,6 +1,6 @@
 # G710 Switch Mode Enabler
 
-A small Windows tool that puts the **Redragon Rift G710** controller into its **Nintendo Switch Pro Controller mode**, so emulators with native Pro Controller support can use its buttons, sticks and 6-axis motion sensors (gyro).
+A small Windows tool that **attempts** to put the **Redragon Rift G710** controller into its **Nintendo Switch Pro Controller mode**, so emulators with native Pro Controller support can use its buttons, sticks and 6-axis motion sensors (gyro).
 
 The controller's manual doesn't document this mode. This project exists because the mode turns out to be reachable, and nobody had written down how.
 
@@ -45,7 +45,7 @@ What was observed, and what we conclude from it:
 
 From this, the working theory is that the controller's firmware picks its mode depending on how the host computer behaves in the first moments after it is plugged in. Browsers and Device Manager enumerate and poll gamepad and HID devices as soon as they appear; the Game Controllers window grabs the device through the older DirectInput API, which keeps it in its default mode. This is a theory based on observation. It is not confirmed by the manufacturer.
 
-**What this tool does:** it only imitates that early activity. While you plug the controller in, it polls the four XInput slots and repeatedly enumerates raw HID devices, then watches for `057E:2009` to appear. It sends **no commands, no firmware writes, and no Pro Controller handshake** to the controller. It needs no drivers, no admin rights, and installs nothing.
+**What this tool does:** it only imitates that early activity. While you plug the controller in, it polls the four XInput slots and repeatedly enumerates raw HID devices, then watches for a device with the ID `057E:2009` to appear. Seeing that ID is a good sign, not proof, so always [check it yourself](#checking-that-it-worked). It sends **no commands, no firmware writes, and no Pro Controller handshake** to the controller. It needs no drivers, no admin rights, and installs nothing.
 
 Everything after the mode switch (button mapping, gyro, rumble) is handled by your emulator or app, as it would be for a real Pro Controller.
 
@@ -83,13 +83,13 @@ A single `switch_mode.exe`. No installation, no Python, no dependencies.
 4. **Unplug the controller.**
 5. Double-click `switch_mode.exe`. A console window opens and says it's probing.
 6. **Now plug the controller in.**
-7. Wait a few seconds. The window should print `SUCCESS: controller is in Nintendo Switch Pro mode`.
-8. Press Enter to close the window, then open your emulator and check the controller ([how to verify](#checking-that-it-worked)).
+7. Wait a few seconds. If Windows lists a device with the Switch Pro ID, the window prints `ATTEMPT FINISHED` and asks you to verify.
+8. Press Enter to close the window, then **check whether it really became a Pro Controller** in your emulator ([how to verify](#checking-that-it-worked)).
 
 **Do**
 
 - Run it before plugging the controller in.
-- Leave the window open until it prints a result (it gives up after 60 seconds).
+- Leave the window open until it prints a result and then verify it yourself (it gives up after 60 seconds).
 - If the mode drops back after you close the program, run it from a terminal with `switch_mode.exe --hold` and leave it open while you play.
 
 **Don't**
@@ -119,7 +119,7 @@ Same logic as Method 1, without the executable.
    python switch_mode.py
    ```
 6. When it says it's probing, **plug the controller in**.
-7. Wait for `SUCCESS: controller is in Nintendo Switch Pro mode`, then check it in your emulator.
+7. Wait for `ATTEMPT FINISHED`, then **check in your emulator** whether it really became a Pro Controller ([how to verify](#checking-that-it-worked)).
 
 **Do**
 
@@ -146,7 +146,7 @@ Same logic as Method 1, without the executable.
 3. Open `switch_mode.html` in **Chrome or Edge** (double-click it, or drag it into the browser). Other browsers are untested.
 4. Keep that tab **visible and in front**.
 5. **Plug the controller in.**
-6. The page should show `Detected: ...`. Check the controller in your emulator ([how to verify](#checking-that-it-worked)).
+6. The page may show `The browser detected a gamepad: ...`. That does not confirm anything, so **check in your emulator** whether it became a Pro Controller ([how to verify](#checking-that-it-worked)).
 
 **If it doesn't work the first time** (this method is finicky):
 
@@ -166,7 +166,7 @@ Same logic as Method 1, without the executable.
 - Don't have the Game Controllers window open at the same time. It stops this from working.
 - Don't plug the controller in before opening the page.
 
-The page itself says `Detected: ...` even for a controller in normal mode, so seeing that text doesn't prove the switch happened. Verify in an emulator or in Device Manager.
+The page shows its message even for a controller in normal mode, so seeing it doesn't prove the switch happened. Verify in an emulator or in Device Manager.
 
 ---
 
@@ -200,7 +200,7 @@ Simply having Device Manager open when you plug in has been enough to trigger th
 
 Either:
 
-**In an emulator or app** that supports the Pro Controller: it should show up as a *Nintendo Pro Controller* (or similar), and motion data should be available.
+**In an emulator or app** that supports the Pro Controller: it should show up as a *Nintendo Pro Controller* (or similar), and motion data should be available. If it doesn't, the attempt didn't work.
 
 **In Device Manager:**
 
@@ -219,8 +219,8 @@ Based on our testing, unplugging the controller and plugging it in again **witho
 
 ## Troubleshooting
 
-- **Times out or stays in normal mode:** unplug, make sure `joy.cpl`, Steam and other gamepad tools are closed, start the method, then plug in again. Try `--pnp`.
-- **The page or program says it detected the controller, but it isn't in Switch mode:** a "detected" message alone doesn't prove it. Verify with the [hardware ID](#checking-that-it-worked).
+- **Times out or stays in normal mode:** unplug, make sure `joy.cpl`, Steam and other gamepad tools are closed, start the method, then plug in again. I also recommend connecting the controller normally, press the home button to put in in XInput mode, then unpluging it. then run the run the script/program/html then plug in the controller again. it should work this way. try at least 3 more times before attempting a different method. also  Try `--pnp` in case that works for you.
+- **The page or program reports something, but it isn't acting as a Pro Controller:** those messages only show an attempt was made and a device ID was seen. Verify with the [hardware ID](#checking-that-it-worked).
 - **Mode drops after closing the tool:** use `--hold` and keep it running while you play.
 - **Works in the script but not the exe (or the other way round):** please open an issue and include which one worked.
 - **Different hardware ID:** if your controller shows different IDs than those in the table above, open an issue with the IDs. It may be a different revision.
