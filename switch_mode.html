@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nintendo Switch Mode Enabler</title>
+</head>
+<body>
+    <p>Connect your Redragon G710 <strong>while this page is open</strong>.</p>
+    <p id="status">Polling started - waiting for connection...</p>
+
+    <script>
+        const statusEl = document.getElementById('status');
+
+        // Start the tight polling loop immediately – this is the magic.
+        setInterval(() => {
+            navigator.getGamepads();
+        }, 1);  // 1ms, identical to the original wavelovers code
+
+        // Optional: just for visual feedback if the event fires quickly
+        window.addEventListener('gamepadconnected', (event) => {
+            statusEl.textContent = 'Detected: ' + event.gamepad.id + '\nIf you see this, it might mean that your gamepad didn\'t fall into "Switch Mode". Verify this first, using a game or app that has native support for the Nintendo Pro Controller (i.e: Emulators)';
+        });
+    </script>
+</body>
+</html>
