@@ -200,7 +200,9 @@ Simply having Device Manager open when you plug in has been enough to trigger th
 
 ## Checking that it worked
 
-Either:
+**In Game Controllers window (`joy.cpl`):** if it looks like this, don't panic! This means **it's in the Switch Pro mode**, but windows don't know how to read this kind of controller, but any app that supports it, can use it.
+<img width="604" height="364" alt="" src="https://github.com/user-attachments/assets/69538a7f-3a65-4b15-bc77-a327e26fcbab" />
+
 
 **In an emulator or app** that supports the Pro Controller: it should show up as a *Nintendo Pro Controller* (or similar), and motion data should be available. If it doesn't, the attempt didn't work.
 
