@@ -12,9 +12,9 @@ The controller's manual doesn't document this mode. This project exists because 
 
 - [How it works](#how-it-works)
 - [Which method should I use?](#which-method-should-i-use)
-- [Method 1: Portable executable (recommended)](#method-1-portable-executable-recommended)
-- [Method 2: Run the Python script](#method-2-run-the-python-script)
-- [Method 3: HTML page (fallback)](#method-3-html-page-fallback)
+- [Method 1: HTML page (recommended)](#method-1-html-page-recommended)
+- [Method 2: Portable executable](#method-2-portable-executable)
+- [Method 3: Run the Python script](#method-3-run-the-python-script)
 - [Method 4: Device Manager (fallback)](#method-4-device-manager-fallback)
 - [Checking that it worked](#checking-that-it-worked)
 - [Going back to normal](#going-back-to-normal)
@@ -57,9 +57,9 @@ Only to initialize the controller in the Pro Controller mode and you close it af
 
 | # | Method | Needs | Reliability |
 |---|---|---|---|
-| 1 | Portable executable | Nothing | Best, start here |
-| 2 | Python script | Python 3.8+ | Same as 1 |
-| 3 | HTML page | Chrome or Edge | Fallback, finicky |
+| 1 | HTML page | Chrome or Edge | Recommended, start here |
+| 2 | Portable executable | Nothing | Alternative, shows a log of what happened |
+| 3 | Python script | Python 3.8+ | Same as 2 |
 | 4 | Device Manager | Nothing | Fallback, finicky |
 
 All four rely on the same idea: something must be actively watching for gamepads **at the moment you plug the controller in**.
@@ -73,7 +73,42 @@ All four rely on the same idea: something must be actively watching for gamepads
 
 ---
 
-## Method 1: Portable executable (recommended)
+## Method 1: HTML page (recommended)
+
+`switch_mode.html` is the original discovery. It does nothing except continuously call the browser's Gamepad API, which is what ends up making the controller stay in the Switch Pro Controller mode.
+
+**Steps**
+
+1. Close the Game Controllers window (`joy.cpl`) and any other gamepad software.
+2. **Unplug the controller.**
+3. Open `switch_mode.html` in **Chrome or Edge** (double-click it, or drag it into the browser). Other browsers are untested.
+4. Keep that tab **visible and in front**.
+5. **Plug the controller in.**
+6. The page may show `The browser detected a gamepad: ...`. That does not confirm anything, so **check in your emulator** whether it became a Pro Controller ([how to verify](#checking-that-it-worked)).
+
+**If it doesn't work the first time:**
+
+1. Plug the controller in normally once, so it settles as a regular controller.
+2. Unplug it.
+3. **Refresh** the page (F5).
+4. Plug the controller in again.
+
+**Do**
+
+- Keep the page in its own window or the front tab while plugging in.
+- Refresh the page before each new attempt.
+
+**Don't**
+
+- Don't leave the page in a background tab. Browsers throttle hidden tabs and stop delivering gamepad data.
+- Don't have the Game Controllers window open at the same time. It stops this from working.
+- Don't plug the controller in before opening the page.
+
+The page shows its message even for a controller in normal mode, so seeing it doesn't prove the switch happened. Verify in an emulator or in Device Manager.
+
+---
+
+## Method 2: Portable executable
 
 A single `switch_mode.exe`. No installation, no Python, no dependencies.
 
@@ -106,9 +141,9 @@ A single `switch_mode.exe`. No installation, no Python, no dependencies.
 
 ---
 
-## Method 2: Run the Python script
+## Method 3: Run the Python script
 
-Same logic as Method 1, without the executable.
+Same logic as Method 2, without the executable.
 
 **Steps**
 
@@ -137,41 +172,6 @@ Same logic as Method 1, without the executable.
 
 ---
 
-## Method 3: HTML page (fallback)
-
-`switch_mode.html` is the original discovery. It does nothing except continuously call the browser's Gamepad API, which is what ends up making the controller stay in the Switch Pro Controller mode.
-
-**Steps**
-
-1. Close the Game Controllers window (`joy.cpl`) and any other gamepad software.
-2. **Unplug the controller.**
-3. Open `switch_mode.html` in **Chrome or Edge** (double-click it, or drag it into the browser). Other browsers are untested.
-4. Keep that tab **visible and in front**.
-5. **Plug the controller in.**
-6. The page may show `The browser detected a gamepad: ...`. That does not confirm anything, so **check in your emulator** whether it became a Pro Controller ([how to verify](#checking-that-it-worked)).
-
-**If it doesn't work the first time** (this method is finicky):
-
-1. Plug the controller in normally once, so it settles as a regular controller.
-2. Unplug it.
-3. **Refresh** the page (F5).
-4. Plug the controller in again.
-
-**Do**
-
-- Keep the page in its own window or the front tab while plugging in.
-- Refresh the page before each new attempt.
-
-**Don't**
-
-- Don't leave the page in a background tab. Browsers throttle hidden tabs and stop delivering gamepad data.
-- Don't have the Game Controllers window open at the same time. It stops this from working.
-- Don't plug the controller in before opening the page.
-
-The page shows its message even for a controller in normal mode, so seeing it doesn't prove the switch happened. Verify in an emulator or in Device Manager.
-
----
-
 ## Method 4: Device Manager (fallback)
 
 Simply having Device Manager open when you plug in has been enough to trigger the switch. No tools are needed.
@@ -194,7 +194,7 @@ Simply having Device Manager open when you plug in has been enough to trigger th
 
 - Don't open the Game Controllers window (`joy.cpl`) at the same time.
 - Don't open Device Manager after plugging the controller in.
-- Don't expect this to be as reliable as Method 1 or 2.
+- Don't expect this to be as reliable as the other methods.
 
 ---
 
